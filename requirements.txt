@@ -1,0 +1,12 @@
+turbovec[langchain]
+langchain
+langchain-community
+langchain-google-genai
+fastapi
+uvicorn
+crawl4ai
+beautifulsoup4
+requests
+numpy
+pydantic
+aiohttp

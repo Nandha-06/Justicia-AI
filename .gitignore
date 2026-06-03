@@ -1,0 +1,29 @@
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Secrets and local configurations
+.env
+.env.*
+
+# Python caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+
+# System-specific files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo

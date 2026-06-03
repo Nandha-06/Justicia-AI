@@ -1,0 +1,1 @@
+{"schema_version": 1, "docs": {"doc-1": {"text": "Hello world", "metadata": {"source": "a"}}, "doc-2": {"text": "Legal document", "metadata": {"source": "b"}}}, "str_to_u64": {"doc-1": 1, "doc-2": 2}, "next_u64": 2, "bit_width": 4}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharatiya Nyaya Sanhita (BNS) AI Legal Assistant</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Marked.js Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar for Pipeline Controls -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon">
+                    <i data-lucide="scale"></i>
+                </div>
+                <div>
+                    <h1>Justicia AI</h1>
+                    <span class="subtitle">BNS Law RAG System</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-header" onclick="togglePipelineTools()" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="activity"></i>
+                        <h2>System Status</h2>
+                    </div>
+                    <i data-lucide="chevron-right" id="pipeline-chevron" style="width: 14px; height: 14px; transition: transform 0.25s; color: var(--text-muted);"></i>
+                </div>
+                
+                <div class="status-card">
+                    <!-- API Key Configuration Status -->
+                    <div class="status-item">
+                        <span class="status-label">LLM Connection</span>
+                        <span id="api-key-status" class="badge">
+                            <span class="indicator"></span>Checking...
+                        </span>
+                    </div>
+                    
+                    <!-- Scraper Status -->
+                    <div class="status-item">
+                        <span class="status-label">Law Cache (JSON)</span>
+                        <span id="scraper-status-text" class="badge">Checking...</span>
+                    </div>
+
+                    <!-- Ingestion / Vector DB Status -->
+                    <div class="status-item">
+                        <span class="status-label">TurboVec Index</span>
+                        <span id="db-status-text" class="badge">Checking...</span>
+                    </div>
+                </div>
+
+                <!-- Collapsible Administrative Controls -->
+                <div id="pipeline-admin-controls" class="admin-controls collapsed">
+                    <div class="progress-details-container">
+                        <div class="progress-bar-container">
+                            <div id="scrape-progress" class="progress-bar" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-details" style="margin-top: 6px;">
+                            <span id="scrape-progress-text">0 / 358 sections</span>
+                        </div>
+                    </div>
+                    <div class="admin-buttons">
+                        <button id="btn-scrape" class="btn btn-secondary btn-sm" onclick="triggerScrape()">
+                            <i data-lucide="refresh-cw"></i> Re-scrape
+                        </button>
+                        <button id="btn-ingest" class="btn btn-secondary btn-sm" onclick="triggerIngest()" disabled>
+                            <i data-lucide="database"></i> Re-index
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section info-section">
+                <div class="section-header">
+                    <i data-lucide="info"></i>
+                    <h2>About BNS 2023</h2>
+                </div>
+                <p>The <strong>Bharatiya Nyaya Sanhita (BNS), 2023</strong> is the official penal code of India, replacing the Indian Penal Code (IPC) of 1860. It streamlines penal provisions, updates modern offences, and has exactly 358 sections.</p>
+                <div class="tech-stack-badges">
+                    <span>TurboVec (TurboQuant)</span>
+                    <span>LangChain Agents</span>
+                    <span>Gemma-4-31b-it</span>
+                    <span>FastAPI</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <p>&copy; 2026 Justicia AI RAG Engine</p>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <!-- Left empty for alignment -->
+                </div>
+                <div class="topbar-right">
+                    <button class="btn-new-chat" onclick="clearChat()" title="Start New Conversation">
+                        <i data-lucide="plus"></i> New Chat
+                    </button>
+                </div>
+            </header>
+
+            <!-- Messages Window -->
+            <div class="messages-container" id="messages-container">
+                <!-- Welcome Message -->
+                <div class="welcome-box">
+                    <div class="welcome-icon">
+                        <i data-lucide="gavel"></i>
+                    </div>
+                    <h3>Justicia AI</h3>
+                    <p>I am a RAG-powered agent connected to a high-speed local <strong>TurboVec</strong> vector store containing the entire text of the new <strong>Bharatiya Nyaya Sanhita (BNS), 2023</strong>. I use <strong>gemma-4-31b-it</strong> to analyze queries, search the code, and cite proof-verified answers.</p>
+                    
+                    <div class="quick-prompts-header">Try asking me:</div>
+                    <div class="quick-prompts">
+                        <button class="prompt-chip" onclick="sendQuickPrompt('What is Section 302 of the IPC (murder) replaced by in the new BNS?')">
+                            <i data-lucide="arrow-right"></i> What replaces IPC Section 302?
+                        </button>
+                        <button class="prompt-chip" onclick="sendQuickPrompt('What is the definition and punishment for theft in BNS?')">
+                            <i data-lucide="arrow-right"></i> Definition & punishment of theft
+                        </button>
+                        <button class="prompt-chip" onclick="sendQuickPrompt('Explain how good faith is defined under the General Explanations of BNS.')">
+                            <i data-lucide="arrow-right"></i> How is 'good faith' defined?
+                        </button>
+                        <button class="prompt-chip" onclick="sendQuickPrompt('What are the categories of punishments under Section 4 of BNS?')">
+                            <i data-lucide="arrow-right"></i> List punishments under Section 4
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Container -->
+            <footer class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="user-input" 
+                        placeholder="Enter your legal query here... (e.g. 'What is the punishment for cyber terrorism in BNS?')" 
+                        rows="1"
+                        onkeydown="handleKeyPress(event)"
+                    ></textarea>
+                    <button id="btn-send" class="btn-send" onclick="sendQuery()">
+                        <i data-lucide="send"></i>
+                    </button>
+                </div>
+                <div class="input-info">
+                    NyayaSanhita AI can make mistakes. Always cross-verify citations against the official gazette.
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Script Entry -->
+    <script src="app.js"></script>
+</body>
+</html>
